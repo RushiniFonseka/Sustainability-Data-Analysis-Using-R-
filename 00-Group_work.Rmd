@@ -1,0 +1,82 @@
+---
+title: "Group Work"
+author: "PS/2020/215"
+date: "2024-02-24"
+output: html_document
+---
+```{r}
+#import data to R
+#install.packages("dplyr")
+library(dplyr)
+options(scipen = 4) #Scientific notation
+
+df <- read.csv("C:/Users/HP/Desktop/kaleniya/2nd year/sem 2/Stat Lab/R_files/extracted data.csv")
+
+head(df)
+
+#counting missing values
+missing_count <- vector()
+for(i in 1:213){
+  missing_count[i] <- sum(is.na(df[i,5:68]))
+}
+
+#assign the column missing count
+df$missing_count<- missing_count
+
+missing_count_percent<-vector()
+for (i in 1:213) {
+  missing_count_percent[i] <- sum(is.na(df[i,5:68]))/64*100
+}
+
+
+#assign the column missing count percent
+df$missing_count_percent<-missing_count_percent
+
+#calculate the mean of given data
+df[, 5:68][is.na(df[, 5:68])]<-0
+mean_val<-vector()
+sum_val<-vector()
+
+for (i in 1:213) {
+  sum_val[i]<-rowSums(df[i,5:68],na.rm = T,dims = 1)
+ 
+}
+for (i in 1:213) {
+  mean_val[i] <-sum_val[i]/(64-missing_count[i])
+}
+df$mean_val<-mean_val
+
+#replace the missing values with the mean
+for (i in 1:213) {
+  for (j in 5:68) {
+    if(df[i,j] == 0){
+      df[i,j] <- mean_val[i]
+    }
+  }
+}
+
+#sort out the rows that have missing count less that to the 70%
+df<-df[df$missing_count_percent<=70  & df$mean_val!=0 ,]
+
+head(df)
+
+###############################################################
+# Conditions for splitting
+condition1 <- df$Country.Name == "France"
+condition2 <- df$Country.Name == "Germany"
+condition3 <- df$Country.Name == "Greece"
+
+# Create three separate data frames based on country
+df_FR <- subset(df, condition1)
+df_GE <- subset(df, condition2)
+df_GR <- subset(df, condition3)
+
+
+# Split the data frame of France into sub-data frames based on Indicator Type
+sub_dfs_FR <- split(df_FR,df_FR$Indicator.Name)
+# Split the data frame of Germany into sub-data frames based on Indicator Type
+sub_dfs_GE <- split(df_GE,df_GE$Indicator.Name)
+# Split the data frame of Greece into sub-data frames based on Indicator Type
+sub_dfs_GR <- split(df_GR,df_GR$Indicator.Name)
+```
+

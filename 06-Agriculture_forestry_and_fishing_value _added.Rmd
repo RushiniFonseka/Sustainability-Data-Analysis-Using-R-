@@ -1,0 +1,79 @@
+---
+title: "06-Agriculture, forestry, and fishing, value added (% of GDP)"
+author: "PS/2020/215"
+date: "2024-02-24"
+output: html_document
+---
+```{r}
+df1 <- data.frame()
+df2 <- data.frame()
+df3 <- data.frame()
+variable_summary <- function(country, indicator, DF, df) {
+  indicator_found <- FALSE  # Flag to track if the indicator is found
+  
+  for (i in 1:length(country)) {
+    if(indicator[i] == "NV.AGR.TOTL.ZS") {
+      df <- data.frame(t(DF[i, 5:68]))  # Create a temporary data frame
+      
+      print(paste("Summary of Agriculture, forestry, and fishing, value added (% of GDP) in", country[i], ":"))
+      print(df)
+      print(summary(df))
+      
+      plotData<-data.frame(Year = seq(1960, 2023),
+  df)
+      plot(as.matrix(plotData), pch = 16, col = "orange", main = paste("Agriculture, forestry, and fishing, value added (% of GDP) in", country[i]), 
+           xlab = "Year", ylab = "Value (% of GDP)")
+      boxplot(df,col = "yellow",main = paste("Agriculture, forestry, and fishing, value added (% of GDP) in", country[i])) 
+      indicator_found <- TRUE  # Set the flag to indicate the indicator is found
+      return(df)
+      break
+    }
+  }
+  
+  if (!indicator_found) {  # Check the flag to see if the indicator is not found
+    print("There is no indicator code as NV.AGR.TOTL.ZS in the provided data.")
+  }
+}
+
+
+print("Data according to France:")
+df1<-variable_summary(df_FR$Country.Code, df_FR$Indicator.Code, df_FR, df1)
+print("Data according to Germany:")
+df2<-variable_summary(df_GE$Country.Code, df_GE$Indicator.Code, df_GE, df2)
+print("Data according to Greece:")
+df3<-variable_summary(df_GR$Country.Code, df_GR$Indicator.Code, df_GR, df3)
+
+#install.packages("ggplot2")
+library(ggplot2)
+
+# Rename columns
+colnames(df1) <- "France"
+colnames(df2) <- "Germany"
+colnames(df3) <- "Greece"
+
+# Combine the data frames
+plot_data <- data.frame(
+  Year = seq(1960, 2023),
+  df1,
+  df2,
+  df3
+)
+
+# Plot line graph using ggplot2
+ggplot(plot_data, aes(x = Year)) +
+  geom_line(aes(y = France, color = "France"), size = 1) +
+  geom_line(aes(y = Germany, color = "Germany"), size = 1) +
+  geom_line(aes(y = Greece, color = "Greece"), size = 1) +
+  labs(
+    title = "Agriculture, forestry, and fishing, value added (% of GDP)",
+    x = "Year",
+    y = "Value(% of GDP)",
+    color = "Country"
+  ) +
+  scale_color_manual(values = c("France" = "blue", "Germany" = "green", "Greece" = "red"))
+
+
+#interpretation: based on the data shows the agriculture, forestry, and fishing, value added (% of GDP) for France, Germany, and Greece.The observations are,France: The value added by agriculture, forestry, and fishing has steadily declined in France, from over 5% of GDP in 1960 to around 1.9% in 2022.Germany: Similar to France, Germany has also seen a decline in the contribution of this sector to its GDP, from around 5% in 1960 to around 0.9% in 2022.Greece: Compared to France and Germany, Greece has a larger share of its GDP coming from agriculture, forestry, and fishing. While there have been fluctuations, it has generally remained above 3% throughout the period, reaching around 3.8% in 2022.
+
+```
+

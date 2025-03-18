@@ -1,0 +1,76 @@
+---
+title: "04-Adjusted savings: net forest depletion(% of GNI)"
+author: "PS/2020/215"
+date: "2024-02-24"
+output: html_document
+---
+```{r}
+df1 <- data.frame()
+df2 <- data.frame()
+df3 <- data.frame()
+variable_summary <- function(country, indicator, DF, df, missingCount) {
+  indicator_found <- FALSE  # Flag to track if the indicator is found
+  
+  for (i in 1:length(country)) {
+    if(indicator[i] == "NY.ADJ.DFOR.GN.ZS") {
+      df <- data.frame(t(DF[i, 5:68]))  # Create a temporary data frame
+      
+      print(paste("Summary of Adjusted savings: net forest depletion(% of GNI) in", country[i], ":"))
+      print(df)
+      print(summary(df))
+      plotData<-data.frame(Year = seq(1960, 2023),
+  df)
+      plot(as.matrix(plotData), pch = 16, col = "darkgreen", main = paste("Adjusted savings: net forest depletion(% of GNI) in", country[i]), 
+           xlab = "Year", ylab = "Value (% of GNI)")
+      boxplot(df,col = "green",main = paste("Adjusted savings: net forest depletion(% of GNI) in", country[i]))
+      
+      indicator_found <- TRUE  # Set the flag to indicate the indicator is found
+      return(df)
+      break
+    }
+  }
+  
+  if (!indicator_found) {  # Check the flag to see if the indicator is not found
+    print("There is no indicator code as NY.ADJ.DFOR.GN.ZS in the provided data.")
+    
+  }
+}
+
+
+print("Data according to France:")
+df1<-variable_summary(df_FR$Country.Code, df_FR$Indicator.Code, df_FR, df1)
+print("Data according to Germany:")
+df2<-variable_summary(df_GE$Country.Code, df_GE$Indicator.Code, df_GE, df2)
+print("Data according to Greece:")
+df3<-variable_summary(df_GR$Country.Code, df_GR$Indicator.Code, df_GR, df3)
+
+#since the data only provided for France for this indicator we are left to analyse only a one graph.
+
+#install.packages("ggplot2")
+library(ggplot2)
+
+# Rename columns
+colnames(df1) <- "France"
+
+# Combine the data frames
+plot_data <- data.frame(
+  Year = seq(1960, 2023),
+  df1
+)
+
+# Plot line graph using ggplot2
+ggplot(plot_data, aes(x = Year)) +
+  geom_line(aes(y = France, color = "France"), size = 1) +
+  labs(
+    title = "Adjusted savings: net forest depletion(% of GNI)",
+    x = "Year",
+    y = "Value(% of GNI)",
+    color = "Country"
+  ) +
+  scale_color_manual(values = c("France" = "blue"))
+
+
+
+#interpretation: the graph is showing Adjusted savings: net forest depletion(% of GNI) over the period of 1960-2023 years in France.The graph has a visible fluctuation over the time while 1960-1970 and around 2000-2020 maintained a same level near 0.05 % of GNI.The figure went sky rocketed until hit the 0.124631 % of GNI after the year 1970 and eventually it has decreases till 2000 and hit the bottom with accounting 0.007643% of GNI.considering the box plot, most of the values are above the average 0.06115 % and overall the figure has a moderate negative relationship with the values and years.
+```
+

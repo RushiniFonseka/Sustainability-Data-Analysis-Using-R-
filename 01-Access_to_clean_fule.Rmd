@@ -1,0 +1,77 @@
+---
+title: "01-Access to clean fuels and technologies for cooking (% of population)"
+author: "PS/2020/215"
+date: "2024-02-23"
+output: html_document
+---
+```{r}
+df1 <- data.frame()
+df2 <- data.frame()
+df3 <- data.frame()
+
+variable_summary=function(country,indicator,DF,df){
+  indicator_found <- FALSE
+  for (i in 1:length(country)) {
+  if(indicator[i] == "EG.CFT.ACCS.ZS"){
+    df <- data.frame(t(DF[i, 5:68]))
+    print(paste("Summary of Access to clean fuels and technologies for cooking (% of population) in", country[i], ":"))
+    print(df)
+    print(summary(df))
+    print(str(df))
+    
+    barplot(as.matrix(df), beside = TRUE, main = paste("Clean fuels and technologies for cooking in", country[i]), 
+              xlab = "Year", ylab = "Value(% of population)", col = "pink")
+    indicator_found <- TRUE  # Set the flag to indicate the indicator is found
+    boxplot(df,main = paste("Clean fuels and technologies for cooking in", country[i]))
+    return(df)
+    break
+  
+  }
+}
+
+if (!indicator_found) {  # Check the flag to see if the indicator is not found
+    print("There is no indicator code as EG.CFT.ACCS.ZS in the provided data.")
+  }
+}
+
+print("Data according to France:")
+df1<-variable_summary(df_FR$Country.Code, df_FR$Indicator.Code, df_FR, df1)
+print("Data according to Germany:")
+df2<-variable_summary(df_GE$Country.Code, df_GE$Indicator.Code, df_GE, df2)
+print("Data according to Greece:")
+df3<-variable_summary(df_GR$Country.Code, df_GR$Indicator.Code, df_GR, df3)
+
+#install.packages("ggplot2")
+library(ggplot2)
+
+# Rename columns
+colnames(df1) <- "France"
+colnames(df2) <- "Germany"
+colnames(df3) <- "Greece"
+
+# Combine the data frames
+plot_data <- data.frame(
+  Year = seq(1960, 2023),
+  df1,
+  df2,
+  df3
+)
+
+# Plot line graph using ggplot2
+ggplot(plot_data, aes(x = Year)) +
+  geom_line(aes(y = France, color = "France"), size = 1) +
+  geom_line(aes(y = Germany, color = "Germany"), size = 1) +
+  geom_line(aes(y = Greece, color = "Greece"), size = 1) +
+  labs(
+    title = "Access to clean fuels and technologies for cooking (% of population)",
+    x = "Year",
+    y = "Value(% of population)",
+    color = "Country"
+  ) +
+  scale_color_manual(values = c("France" = "blue", "Germany" = "green", "Greece" = "red"))
+
+
+#interpretation: Considering the bar charts and summary of the three countries it seems like all the countries have the 100 (% of population) after replacing missing value to the mean:100 and correcting it to less than 70%
+
+```
+

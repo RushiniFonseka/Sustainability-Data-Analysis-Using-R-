@@ -1,0 +1,77 @@
+---
+title: "03-Adjusted savings: natural resources depletion (% of GNI)"
+author: "PS/2020/215"
+date: "2024-02-23"
+output: html_document
+---
+```{r}
+df1 <- data.frame()
+df2 <- data.frame()
+df3 <- data.frame()
+variable_summary <- function(country, indicator, DF, df, missingCount) {
+  indicator_found <- FALSE  # Flag to track if the indicator is found
+  
+  for (i in 1:length(country)) {
+    if(indicator[i] == "NY.ADJ.DRES.GN.ZS") {
+      df <- data.frame(t(DF[i, 5:68]))  # Create a temporary data frame
+      
+      print(paste("Summary of Adjusted savings: natural resources depletion (% of GNI) in", country[i], ":"))
+      print(df)
+      print(summary(df))
+      
+      plot(as.matrix(df), pch = 16, col = "blue", main = paste("Adjusted savings: natural resources depletion in", country[i]), 
+           xlab = "Year", ylab = "Value (% of GNI)")
+      boxplot(df,col = "pink",main = paste("Adjusted savings: natural resources depletion in", country[i]))
+      indicator_found <- TRUE  # Set the flag to indicate the indicator is found
+      return(df)
+      break
+    }
+  }
+  
+  if (!indicator_found) {  # Check the flag to see if the indicator is not found
+    print("There is no indicator code as NY.ADJ.DRES.GN.ZS in the provided data.")
+  }
+}
+
+
+print("Data according to France:")
+df1<-variable_summary(df_FR$Country.Code, df_FR$Indicator.Code, df_FR, df1)
+print("Data according to Germany:")
+df2<-variable_summary(df_GE$Country.Code, df_GE$Indicator.Code, df_GE, df2)
+print("Data according to Greece:")
+df3<-variable_summary(df_GR$Country.Code, df_GR$Indicator.Code, df_GR, df3)
+
+#since the data only provided for France and Germany , we are able to draw only two graphs.
+
+#install.packages("ggplot2")
+library(ggplot2)
+
+# Rename columns
+colnames(df1) <- "France"
+colnames(df2) <- "Germany"
+
+
+# Combine the data frames
+plot_data <- data.frame(
+  Year = seq(1960, 2023),
+  df1,
+  df2
+)
+
+# Plot line graph using ggplot2
+ggplot(plot_data, aes(x = Year)) +
+  geom_line(aes(y = France, color = "France"), size = 1) +
+  geom_line(aes(y = Germany, color = "Germany"), size = 1) +
+  
+  labs(
+    title = "Adjusted savings: natural resources depletion (% of GNI)",
+    x = "Year",
+    y = "Value(% of GNI)",
+    color = "Country"
+  ) +
+  scale_color_manual(values = c("France" = "blue", "Germany" = "green"))
+
+#interpretation: the graph shows the adjusted savings: natural resources depletion (% of GNI) for France and Germany from 1960 to 2023.observations for each counties are,Overall,France: Fluctuates around an average of 20% adjusted savings with no clear upward or downward trend. Natural resources depletion fluctuates around 2% with a possible slight decrease over time.Germany: Similar to France, adjusted savings fluctuate around an average of 23% with no clear trend. Natural resources depletion also fluctuates around 2% with a possible slight decrease over time.Both France and Germany have higher adjusted savings compared to natural resources depletion, indicating that they are generally saving more than they are depleting their natural resources.The fluctuations in both adjusted savings and natural resources depletion likely reflect complex economic and environmental factors specific to each country.
+
+```
+

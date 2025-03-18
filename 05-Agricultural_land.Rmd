@@ -1,0 +1,77 @@
+---
+title: "05-Agricultural land (% of land area)"
+author: "PS/2020/215"
+date: "2024-02-24"
+output: html_document
+---
+```{r}
+df1 <- data.frame()
+df2 <- data.frame()
+df3 <- data.frame()
+variable_summary <- function(country, indicator, DF, df, missingCount) {
+  indicator_found <- FALSE  # Flag to track if the indicator is found
+  
+  for (i in 1:length(country)) {
+    if(indicator[i] == "AG.LND.AGRI.ZS") {
+      df <- data.frame(t(DF[i, 5:68]))  # Create a temporary data frame
+      
+      print(paste("Summary of Agricultural land (% of land area) in", country[i], ":"))
+      print(df)
+      print(summary(df))
+      plotData<-data.frame(Year = seq(1960, 2023),
+  df)
+      plot(as.matrix(plotData), type = "l", col = "darkblue", main = paste("Agricultural land (% of land area) in", country[i]), 
+           xlab = "Year", ylab = "Value (% of land area)")
+      boxplot(df,col = "purple",main = paste("Agricultural land (% of land area) in", country[i]))
+      indicator_found <- TRUE  # Set the flag to indicate the indicator is found
+      return(df)
+      
+    }
+  }
+  
+  if (!indicator_found) {  # Check the flag to see if the indicator is not found
+    print("There is no indicator code as AG.LND.AGRI.ZS in the provided data.")
+  }
+}
+
+
+print("Data according to France:")
+df1<-variable_summary(df_FR$Country.Code, df_FR$Indicator.Code, df_FR, df1)
+print("Data according to Germany:")
+df2<-variable_summary(df_GE$Country.Code, df_GE$Indicator.Code, df_GE, df2)
+print("Data according to Greece:")
+df3<-variable_summary(df_GR$Country.Code, df_GR$Indicator.Code, df_GR, df3)
+
+#install.packages("ggplot2")
+library(ggplot2)
+
+# Rename columns
+colnames(df1) <- "France"
+colnames(df2) <- "Germany"
+colnames(df3) <- "Greece"
+
+# Combine the data frames
+plot_data <- data.frame(
+  Year = seq(1960, 2023),
+  df1,
+  df2,
+  df3
+)
+
+# Plot line graph using ggplot2
+ggplot(plot_data, aes(x = Year)) +
+  geom_line(aes(y = France, color = "France"), size = 1) +
+  geom_line(aes(y = Germany, color = "Germany"), size = 1) +
+  geom_line(aes(y = Greece, color = "Greece"), size = 1) +
+  labs(
+    title = "Agricultural land (% of land area)",
+    x = "Year",
+    y = "Value(% of land area)",
+    color = "Country"
+  ) +
+  scale_color_manual(values = c("France" = "blue", "Germany" = "green", "Greece" = "red"))
+
+#interpretation: the graph shows the percentage of agricultural land (out of total land area) in France, Germany, and Greece from 1960 to 2023.Overall trends are,France: The percentage of agricultural land in France has slightly decreased over the time period, from around 58% in 1960 to 53% in 2020.Germany: Similar to France, Germany has also seen a slight decrease in the percentage of agricultural land, going from around 53% in 1960 to 48% in 2020.Greece: In contrast to France and Germany, Greece shows a more significant decline in agricultural land, dropping from around 42% in 1960 to 33% in 2020.
+
+```
+

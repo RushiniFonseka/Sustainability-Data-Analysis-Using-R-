@@ -1,0 +1,81 @@
+---
+title: "Annual freshwater withdrawals, total (% of internal resources)"
+author: "PS/2020/215"
+date: "2024-02-24"
+output: html_document
+---
+```{r}
+df1 <- data.frame()
+df2 <- data.frame()
+df3 <- data.frame()
+
+variable_summary <- function(country, indicator, DF, df, missingCount) {
+  indicator_found <- FALSE  # Flag to track if the indicator is found
+  
+  for (i in 1:length(country)) {
+    if(indicator[i] == "ER.H2O.FWTL.ZS") {
+      df <- data.frame(t(DF[i, 5:68]))  # Create a temporary data frame
+      
+      print(paste("Summary of Annual freshwater withdrawals, total (% of internal resources) in", country[i], ":"))
+      print(plot_data)
+      print(summary(df))
+      
+      
+      plotData<-data.frame(Year = seq(1960, 2023),
+  df)
+      plot(as.matrix(plotData), type = "l", col = "brown", main = paste("Annual freshwater withdrawals, total (% of internal resources) in", country[i]), 
+           xlab = "Year", ylab = "Value (% of internal resources)")
+      boxplot(df,col = "lightblue",main = paste("Annual freshwater withdrawals, total (% of internal resources) in", country[i]))
+      
+      indicator_found <- TRUE  # Set the flag to indicate the indicator is found
+      return(df)
+      break
+    }
+  }
+  
+  if (!indicator_found) {  # Check the flag to see if the indicator is not found
+    print("There is no indicator code as ER.H2O.FWTL.ZS in the provided data.")
+  }
+}
+
+
+print("Data according to France:")
+df1<-variable_summary(df_FR$Country.Code, df_FR$Indicator.Code, df_FR, df1)
+print("Data according to Germany:")
+df2<-variable_summary(df_GE$Country.Code, df_GE$Indicator.Code, df_GE, df2)
+print("Data according to Greece:")
+df3<-variable_summary(df_GR$Country.Code, df_GR$Indicator.Code, df_GR, df3)
+
+#install.packages("ggplot2")
+library(ggplot2)
+
+# Rename columns
+colnames(df1) <- "France"
+colnames(df2) <- "Germany"
+colnames(df3) <- "Greece"
+
+# Combine the data frames
+plot_data <- data.frame(
+  Year = seq(1960, 2023),
+  df1,
+  df2,
+  df3
+)
+
+# Plot line graph using ggplot2
+ggplot(plot_data, aes(x = Year)) +
+  geom_line(aes(y = France, color = "France"), size = 1) +
+  geom_line(aes(y = Germany, color = "Germany"), size = 1) +
+  geom_line(aes(y = Greece, color = "Greece"), size = 1) +
+  labs(
+    title = "Annual freshwater withdrawals, total (% of internal resources)",
+    x = "Year",
+    y = "Value(% of internal resources)",
+    color = "Country"
+  ) +
+  scale_color_manual(values = c("France" = "blue", "Germany" = "green", "Greece" = "red"))
+
+#interpretation:the graph you shows the annual freshwater withdrawals for France, Germany, and Greece as a percentage of their total internal resources from 1960 to 2023.France:Freshwater withdrawals have fluctuated over time, with no clear upward or downward trend. The average annual withdrawal is around 13% of total internal resources.Withdrawals were highest in 1962, at 17%, and lowest in 2019, at 11%.Germany:Similar to France, Germany's freshwater withdrawals also fluctuate without a clear trend. The average annual withdrawal is around 11% of total internal resources.Withdrawals were highest in 1986, at 15%, and lowest in 1997, at 8%.Greece:Compared to France and Germany, Greece has consistently withdrawn the least amount of freshwater as a percentage of its internal resources. The average annual withdrawal is around 6%.Withdrawals have slightly increased over time, with the highest withdrawal recorded in 2011, at 9%, and the lowest in 1960, at 4%.
+
+```
+
